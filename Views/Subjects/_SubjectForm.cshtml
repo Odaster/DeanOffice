@@ -1,0 +1,8 @@
+@model Subject
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="row">
+    <div class="col-md-3 mb-3"><label asp-for="Code" class="form-label">Код</label><input asp-for="Code" class="form-control" /></div>
+    <div class="col-md-6 mb-3"><label asp-for="Name" class="form-label">Название</label><input asp-for="Name" class="form-control" /></div>
+    <div class="col-md-3 mb-3"><label asp-for="Hours" class="form-label">Часы</label><input asp-for="Hours" class="form-control" /></div>
+</div>

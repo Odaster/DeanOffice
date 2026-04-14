@@ -1,0 +1,14 @@
+@model Group
+
+@{
+    ViewData["Title"] = "Добавить группу";
+}
+
+<h1 class="h3">Добавить группу</h1>
+<form asp-action="Create" method="post">
+    <partial name="_GroupForm" model="Model" />
+    <button class="btn btn-primary" type="submit">Сохранить</button>
+    <a class="btn btn-secondary" asp-action="Index">Назад</a>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,68 @@
+@model StatementRequest
+
+@{
+    ViewData["Title"] = "Печать ведомости";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 no-print">
+    <h1 class="h3 mb-0">Печать ведомости</h1>
+    <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="btn btn-primary" onclick="window.print()">Печать</button>
+        <a class="btn btn-outline-primary" asp-action="ExportWord" asp-route-id="@Model.Id">Word</a>
+        <a class="btn btn-outline-secondary" asp-action="Index">Назад</a>
+    </div>
+</div>
+
+<div class="card p-4 statement-print">
+    <h2 class="h4 text-center mb-4">@Model.RequestType</h2>
+
+    <p><strong>Студент:</strong> @Model.Student?.FullName</p>
+    <p><strong>Группа:</strong> @Model.Student?.Group?.Name</p>
+    <p><strong>Дата заявки:</strong> @Model.CreatedAt.ToString("dd.MM.yyyy")</p>
+
+    @if (Model.RequestType == StatementRequest.TypeEducationCertificate)
+    {
+        <p><strong>Справка с гербом:</strong> @(Model.CertificateWithEmblem ? "Да" : "Нет")</p>
+        <p><strong>Назначение:</strong> @Model.CertificatePurpose</p>
+        <p>Настоящая справка подтверждает, что студент обучается в учебном заведении.</p>
+    }
+    else
+    {
+        <p><strong>Предмет:</strong> @Model.Subject?.Name</p>
+        <p><strong>Преподаватель:</strong> @Model.Teacher?.FullName</p>
+        <p><strong>Дата пропуска:</strong> @Model.MissedDate?.ToString("dd.MM.yyyy")</p>
+        <p><strong>Причина:</strong> @Model.AbsenceReason</p>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.AdminComment))
+    {
+        <p><strong>Комментарий администратора:</strong> @Model.AdminComment</p>
+    }
+
+    <p class="mt-5">Ответственный сотрудник деканата: ____________________</p>
+</div>
+
+@section Scripts {
+    <style>
+        @@media print {
+            header,
+            footer,
+            .no-print {
+                display: none !important;
+            }
+
+            body {
+                background: #ffffff !important;
+            }
+
+            .app-container {
+                max-width: none !important;
+            }
+
+            .statement-print {
+                border: 0 !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+}

@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Деканат</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DeanOfficeCourseWork.styles.css" asp-append-version="true" />
+</head>
+<body>
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        string Active(string controller) => string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+    }
+    <header>
+        <nav class="navbar navbar-expand-xl app-navbar">
+            <div class="container-fluid px-3 px-lg-4">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="mobile-user-summary d-xl-none ms-auto me-2">
+                        <img class="profile-avatar" src="@Url.Action("Avatar", "Profile")" alt="Фото профиля" />
+                        <span>@User.Identity.Name (@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value)</span>
+                    </span>
+                }
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse justify-content-between">
+                    <ul class="navbar-nav app-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link @Active("Home")" asp-controller="Home" asp-action="Index">Главная</a>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item"><a class="nav-link @Active("Students")" asp-controller="Students" asp-action="Index">Студенты</a></li>
+                            <li class="nav-item"><a class="nav-link @Active("Groups")" asp-controller="Groups" asp-action="Index">Группы</a></li>
+                            <li class="nav-item"><a class="nav-link @Active("Teachers")" asp-controller="Teachers" asp-action="Index">Преподаватели</a></li>
+                            <li class="nav-item"><a class="nav-link @Active("Subjects")" asp-controller="Subjects" asp-action="Index">Дисциплины</a></li>
+                            <li class="nav-item"><a class="nav-link @Active("Grades")" asp-controller="Grades" asp-action="Index">Оценки</a></li>
+                            <li class="nav-item"><a class="nav-link @Active("Attendance")" asp-controller="Attendance" asp-action="Index">Посещаемость</a></li>
+                            <li class="nav-item"><a class="nav-link @Active("Reports")" asp-controller="Reports" asp-action="Index">Отчеты</a></li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item"><a class="nav-link @Active("AuditLogs")" asp-controller="AuditLogs" asp-action="Index">Журнал</a></li>
+                                <li class="nav-item"><a class="nav-link @Active("Users")" asp-controller="Users" asp-action="Index">Пользователи</a></li>
+                                <li class="nav-item"><a class="nav-link @Active("StatementRequests")" asp-controller="StatementRequests" asp-action="Index">Ведомости</a></li>
+                                <li class="nav-item"><a class="nav-link @Active("AdminQueryBuilder")" asp-controller="AdminQueryBuilder" asp-action="Index">SQL</a></li>
+                                <li class="nav-item"><a class="nav-link @Active("BackupRestore")" asp-controller="BackupRestore" asp-action="Index">Backup</a></li>
+                            }
+                        }
+                    </ul>
+                    <ul class="navbar-nav app-user-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item d-none d-xl-block">
+                                <span class="nav-link app-user-name">
+                                    <img class="profile-avatar" src="@Url.Action("Avatar", "Profile")" alt="Фото профиля" />
+                                    <span>@User.Identity.Name (@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value)</span>
+                                </span>
+                            </li>
+                            <li class="nav-item"><a class="nav-link @Active("Profile")" asp-controller="Profile" asp-action="Index">Личный кабинет</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Account" asp-action="Logout">Выход</a></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link @Active("Account")" asp-controller="Account" asp-action="Login">Вход</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid app-container px-3 px-lg-4">
+        <main role="main" class="app-main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer app-footer">
+        <div class="container-fluid px-3 px-lg-4">
+            &copy; 2026 - Учебная база данных деканата
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

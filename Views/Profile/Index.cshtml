@@ -1,0 +1,376 @@
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Личный кабинет";
+    var emailCodeIdValue = TempData["EmailCodeId"];
+    var phoneCodeIdValue = TempData["PhoneCodeId"];
+    var emailCodeId = emailCodeIdValue == null ? (int?)null : Convert.ToInt32(emailCodeIdValue);
+    var phoneCodeId = phoneCodeIdValue == null ? (int?)null : Convert.ToInt32(phoneCodeIdValue);
+}
+
+<h1 class="h3 mb-3">Личный кабинет</h1>
+
+@if (TempData["ProfileMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["ProfileMessage"]</div>
+}
+@if (TempData["ProfileError"] != null)
+{
+    <div class="alert alert-danger">@TempData["ProfileError"]</div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="border rounded p-3 h-100">
+            <h2 class="h5">Фото профиля</h2>
+            @if (!string.IsNullOrWhiteSpace(Model.ProfilePhotoPath))
+            {
+                <img src="@Model.ProfilePhotoPath" alt="Фото профиля" class="img-thumbnail mb-3" style="max-width: 180px;" />
+            }
+            else
+            {
+                <div class="text-muted mb-3">Фото не загружено.</div>
+            }
+            <form asp-action="UploadPhoto" method="post" enctype="multipart/form-data" id="profile-photo-form">
+                <input class="form-control mb-2" type="file" name="photo" id="profile-photo-input" accept=".jpg,.jpeg,.png,.gif" />
+                <input type="hidden" name="croppedPhotoData" id="cropped-photo-data" />
+
+                <div id="photo-editor" class="photo-editor d-none">
+                    <canvas id="photo-editor-canvas" width="512" height="512" aria-label="Редактор фото профиля"></canvas>
+                    <div class="d-flex flex-wrap gap-2 my-2">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" id="rotate-photo-left">Повернуть -45°</button>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" id="rotate-photo-right">Повернуть +45°</button>
+                    </div>
+                    <label class="form-label" for="photo-zoom-range">Масштаб</label>
+                    <input class="form-range" type="range" id="photo-zoom-range" min="1" max="3" step="0.05" value="1" />
+                    <div class="form-text mb-2">Удерживайте фото и двигайте его внутри круга. Кадр сохраняется как круглый аватар.</div>
+                </div>
+
+                <button class="btn btn-outline-primary" type="submit">Сохранить фото</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="border rounded p-3 mb-3">
+            <h2 class="h5">Личные данные</h2>
+            <p class="text-muted mb-3">@Model.FullName (@Model.UserName)</p>
+            <form asp-action="UpdatePersonalData" method="post">
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Email" class="form-control" />
+                        <span class="input-group-text">@(Model.EmailConfirmed ? Html.Raw("<span class=\"text-success fw-bold\">✓</span>") : "Не подтверждена")</span>
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="PhoneLocalNumber" class="form-label"></label>
+                    <div class="input-group">
+                        <select asp-for="PhoneCountryCode" class="form-select" style="max-width: 240px;" id="phone-country-select">
+                            @foreach (var country in Model.PhoneCountries)
+                            {
+                                <option value="@country.CountryCode"
+                                        data-calling-code="@country.CallingCode"
+                                        data-min-digits="@country.MinDigits"
+                                        data-max-digits="@country.MaxDigits">
+                                    @country.CountryName @country.CallingCode
+                                </option>
+                            }
+                        </select>
+                        <input asp-for="PhoneLocalNumber" class="form-control" id="phone-local-number" inputmode="numeric" autocomplete="tel-national" />
+                        <span class="input-group-text">@(Model.PhoneNumberConfirmed ? Html.Raw("<span class=\"text-success fw-bold\">✓</span>") : "Не подтвержден")</span>
+                    </div>
+                    <div class="form-text" id="phone-help"></div>
+                    <span asp-validation-for="PhoneLocalNumber" class="text-danger"></span>
+                </div>
+                <button class="btn btn-primary" type="submit">Сохранить личные данные</button>
+            </form>
+        </div>
+
+        <div class="border rounded p-3 mb-3">
+            <h2 class="h5">Подтверждение контактов</h2>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    @if (Model.EmailConfirmed)
+                    {
+                        <div class="alert alert-success mb-0">Почта подтверждена.</div>
+                    }
+                    else
+                    {
+                        <form asp-action="SendEmailCode" method="post" class="mb-2">
+                            <button class="btn btn-outline-success w-100" type="submit">Отправить код на почту</button>
+                        </form>
+                        @if (emailCodeId.HasValue)
+                        {
+                            <form asp-action="ConfirmEmail" method="post">
+                                <input type="hidden" name="EmailCodeId" value="@emailCodeId" />
+                                <div class="input-group">
+                                    <input class="form-control" name="EmailCode" maxlength="6" pattern="\d{6}" inputmode="numeric" placeholder="Код из 6 цифр" />
+                                    <button class="btn btn-success" type="submit">Подтвердить</button>
+                                </div>
+                            </form>
+                        }
+                    }
+                </div>
+                <div class="col-md-6">
+                    @if (Model.PhoneNumberConfirmed)
+                    {
+                        <div class="alert alert-success mb-0">Телефон подтвержден.</div>
+                    }
+                    else
+                    {
+                        <form asp-action="SendPhoneCode" method="post" class="mb-2">
+                            <button class="btn btn-outline-success w-100" type="submit">Отправить код на телефон</button>
+                        </form>
+                        @if (phoneCodeId.HasValue)
+                        {
+                            <form asp-action="ConfirmPhone" method="post">
+                                <input type="hidden" name="PhoneCodeId" value="@phoneCodeId" />
+                                <div class="input-group">
+                                    <input class="form-control" name="PhoneCode" maxlength="6" pattern="\d{6}" inputmode="numeric" placeholder="Код из 6 цифр" />
+                                    <button class="btn btn-success" type="submit">Подтвердить</button>
+                                </div>
+                            </form>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="border rounded p-3">
+            <h2 class="h5">Пароли</h2>
+            <a class="btn btn-outline-primary" asp-controller="Account" asp-action="ChangePassword">Сменить пароль</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const countrySelect = document.getElementById('phone-country-select');
+            const phoneInput = document.getElementById('phone-local-number');
+            const phoneHelp = document.getElementById('phone-help');
+
+            if (!countrySelect || !phoneInput || !phoneHelp) {
+                return;
+            }
+
+            const updatePhoneHint = () => {
+                const option = countrySelect.selectedOptions[0];
+                const callingCode = option.dataset.callingCode;
+                const minDigits = Number(option.dataset.minDigits);
+                const maxDigits = Number(option.dataset.maxDigits);
+                const lengthText = minDigits === maxDigits
+                    ? `${maxDigits} цифр`
+                    : `от ${minDigits} до ${maxDigits} цифр`;
+
+                phoneInput.maxLength = maxDigits;
+                phoneInput.placeholder = minDigits === maxDigits
+                    ? ''.padStart(maxDigits, '0')
+                    : 'Номер без кода страны';
+                phoneHelp.textContent = `Код страны ${callingCode}. Введите номер без кода страны: ${lengthText}.`;
+            };
+
+            phoneInput.addEventListener('input', () => {
+                phoneInput.value = phoneInput.value.replace(/\D/g, '');
+            });
+
+            countrySelect.addEventListener('change', updatePhoneHint);
+            updatePhoneHint();
+        })();
+    </script>
+    <script>
+        (() => {
+            const form = document.getElementById('profile-photo-form');
+            const input = document.getElementById('profile-photo-input');
+            const editor = document.getElementById('photo-editor');
+            const canvas = document.getElementById('photo-editor-canvas');
+            const croppedData = document.getElementById('cropped-photo-data');
+            const zoomRange = document.getElementById('photo-zoom-range');
+            const rotateLeft = document.getElementById('rotate-photo-left');
+            const rotateRight = document.getElementById('rotate-photo-right');
+
+            if (!form || !input || !editor || !canvas || !croppedData || !zoomRange || !rotateLeft || !rotateRight) {
+                return;
+            }
+
+            const context = canvas.getContext('2d');
+            const image = new Image();
+            let imageLoaded = false;
+            let rotation = 0;
+            let zoom = 1;
+            let offsetX = 0;
+            let offsetY = 0;
+            let isDragging = false;
+            let lastPointerX = 0;
+            let lastPointerY = 0;
+
+            const drawGrid = (size, radius) => {
+                context.save();
+                context.beginPath();
+                context.arc(radius, radius, radius - 2, 0, Math.PI * 2);
+                context.clip();
+
+                context.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+                context.lineWidth = 2;
+                [size / 3, size * 2 / 3].forEach((position) => {
+                    context.beginPath();
+                    context.moveTo(position, 0);
+                    context.lineTo(position, size);
+                    context.stroke();
+
+                    context.beginPath();
+                    context.moveTo(0, position);
+                    context.lineTo(size, position);
+                    context.stroke();
+                });
+
+                context.strokeStyle = 'rgba(15, 111, 104, 0.65)';
+                context.lineWidth = 1.5;
+                context.beginPath();
+                context.moveTo(radius, 0);
+                context.lineTo(radius, size);
+                context.moveTo(0, radius);
+                context.lineTo(size, radius);
+                context.stroke();
+                context.restore();
+            };
+
+            const drawPhoto = () => {
+                if (!imageLoaded) {
+                    return;
+                }
+
+                const size = canvas.width;
+                const radius = size / 2;
+                const baseScale = Math.max(size / image.width, size / image.height);
+                const scale = baseScale * zoom;
+                const drawWidth = image.width * scale;
+                const drawHeight = image.height * scale;
+
+                context.clearRect(0, 0, size, size);
+                context.save();
+                context.beginPath();
+                context.arc(radius, radius, radius, 0, Math.PI * 2);
+                context.clip();
+                context.fillStyle = '#e4e9e7';
+                context.fillRect(0, 0, size, size);
+                context.translate(radius + offsetX, radius + offsetY);
+                context.rotate(rotation * Math.PI / 180);
+                context.drawImage(image, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+                context.restore();
+
+                drawGrid(size, radius);
+
+                context.save();
+                context.beginPath();
+                context.arc(radius, radius, radius - 2, 0, Math.PI * 2);
+                context.lineWidth = 4;
+                context.strokeStyle = '#0f6f68';
+                context.stroke();
+                context.restore();
+            };
+
+            input.addEventListener('change', () => {
+                const file = input.files?.[0];
+                if (!file) {
+                    imageLoaded = false;
+                    editor.classList.add('d-none');
+                    croppedData.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    image.onload = () => {
+                        imageLoaded = true;
+                        rotation = 0;
+                        zoom = 1;
+                        offsetX = 0;
+                        offsetY = 0;
+                        zoomRange.value = '1';
+                        editor.classList.remove('d-none');
+                        drawPhoto();
+                    };
+                    image.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            zoomRange.addEventListener('input', () => {
+                zoom = Number(zoomRange.value);
+                drawPhoto();
+            });
+
+            rotateLeft.addEventListener('click', () => {
+                rotation -= 45;
+                drawPhoto();
+            });
+
+            rotateRight.addEventListener('click', () => {
+                rotation += 45;
+                drawPhoto();
+            });
+
+            const getCanvasPoint = (event) => {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                return {
+                    x: (event.clientX - rect.left) * scaleX,
+                    y: (event.clientY - rect.top) * scaleY
+                };
+            };
+
+            canvas.addEventListener('pointerdown', (event) => {
+                if (!imageLoaded) {
+                    return;
+                }
+
+                const point = getCanvasPoint(event);
+                isDragging = true;
+                lastPointerX = point.x;
+                lastPointerY = point.y;
+                canvas.setPointerCapture(event.pointerId);
+                canvas.classList.add('is-dragging');
+            });
+
+            canvas.addEventListener('pointermove', (event) => {
+                if (!isDragging) {
+                    return;
+                }
+
+                const point = getCanvasPoint(event);
+                offsetX += point.x - lastPointerX;
+                offsetY += point.y - lastPointerY;
+                lastPointerX = point.x;
+                lastPointerY = point.y;
+                drawPhoto();
+            });
+
+            const stopDragging = (event) => {
+                if (!isDragging) {
+                    return;
+                }
+
+                isDragging = false;
+                canvas.classList.remove('is-dragging');
+                if (canvas.hasPointerCapture(event.pointerId)) {
+                    canvas.releasePointerCapture(event.pointerId);
+                }
+            };
+
+            canvas.addEventListener('pointerup', stopDragging);
+            canvas.addEventListener('pointercancel', stopDragging);
+            canvas.addEventListener('pointerleave', stopDragging);
+
+            form.addEventListener('submit', () => {
+                if (imageLoaded) {
+                    croppedData.value = canvas.toDataURL('image/png');
+                }
+            });
+        })();
+    </script>
+}

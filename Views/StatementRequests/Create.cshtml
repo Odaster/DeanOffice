@@ -1,0 +1,143 @@
+@model StatementRequestCreateViewModel
+
+@{
+    ViewData["Title"] = "Заказать ведомостичку";
+}
+
+<h1 class="h3 mb-3">Заказать ведомостичку</h1>
+
+<form asp-action="Create" method="post" class="card p-3 p-md-4 statement-form">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="RequestType" class="form-label"></label>
+        <select asp-for="RequestType" class="form-select" id="statementType">
+            <option value="@StatementRequest.TypeEducationCertificate" data-kind="certificate">@StatementRequest.TypeEducationCertificate</option>
+            <option value="@StatementRequest.TypeRetake" data-kind="retake">@StatementRequest.TypeRetake</option>
+        </select>
+        <span asp-validation-for="RequestType" class="text-danger"></span>
+    </div>
+
+    <div id="certificateFields" class="statement-section">
+        <h2 class="h5 mb-3">Поля для справки об обучении</h2>
+        <div class="form-check mb-3">
+            <input asp-for="CertificateWithEmblem" class="form-check-input" />
+            <label asp-for="CertificateWithEmblem" class="form-check-label"></label>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CertificatePurpose" class="form-label">Назначение</label>
+            <select asp-for="CertificatePurpose" class="form-select">
+                <option>По месту требования</option>
+                <option>На работу</option>
+                <option>В налоговую</option>
+                <option>В военкомат</option>
+            </select>
+            <span asp-validation-for="CertificatePurpose" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div id="retakeFields" class="statement-section">
+        <h2 class="h5 mb-3">Поля для пересдачи</h2>
+        <div class="mb-3">
+            <label asp-for="SubjectId" class="form-label"></label>
+            <select asp-for="SubjectId" class="form-select" id="subjectSelect">
+                <option value="">Выберите предмет</option>
+                @foreach (var subject in Model.Subjects)
+                {
+                    <option value="@subject.Id">@subject.Name</option>
+                }
+            </select>
+            <span asp-validation-for="SubjectId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="TeacherId" class="form-label"></label>
+            <select asp-for="TeacherId" class="form-select" id="teacherSelect">
+                <option value="">Выберите преподавателя</option>
+                @foreach (var teacher in Model.Teachers)
+                {
+                    <option value="@teacher.Id" data-subject-id="@teacher.SubjectId">@teacher.Name</option>
+                }
+            </select>
+            <span asp-validation-for="TeacherId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="MissedDate" class="form-label"></label>
+            <input asp-for="MissedDate" class="form-control" type="date" />
+            <span asp-validation-for="MissedDate" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="AbsenceReason" class="form-label"></label>
+            <select asp-for="AbsenceReason" class="form-select">
+                <option>Уважительная</option>
+                <option>Неуважительная</option>
+            </select>
+            <span asp-validation-for="AbsenceReason" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">Заказать</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Назад</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const typeSelect = document.getElementById('statementType');
+            const certificateFields = document.getElementById('certificateFields');
+            const retakeFields = document.getElementById('retakeFields');
+            const subjectSelect = document.getElementById('subjectSelect');
+            const teacherSelect = document.getElementById('teacherSelect');
+
+            function setDisabled(container, disabled) {
+                container.querySelectorAll('input, select, textarea').forEach((field) => {
+                    field.disabled = disabled;
+                });
+            }
+
+            function toggleType() {
+                const selectedOption = typeSelect.options[typeSelect.selectedIndex];
+                const isCertificate = selectedOption?.dataset.kind === 'certificate';
+                certificateFields.classList.toggle('is-disabled', !isCertificate);
+                retakeFields.classList.toggle('is-disabled', isCertificate);
+                setDisabled(certificateFields, !isCertificate);
+                setDisabled(retakeFields, isCertificate);
+                if (!isCertificate) {
+                    filterTeachers();
+                }
+            }
+
+            function filterTeachers() {
+                const subjectId = subjectSelect.value;
+                let selectedTeacherIsVisible = false;
+
+                teacherSelect.querySelectorAll('option').forEach((option) => {
+                    if (!option.value) {
+                        option.hidden = false;
+                        return;
+                    }
+
+                    const isVisible = option.dataset.subjectId === subjectId;
+                    option.hidden = !isVisible;
+                    if (isVisible && option.selected) {
+                        selectedTeacherIsVisible = true;
+                    }
+                });
+
+                if (!selectedTeacherIsVisible) {
+                    teacherSelect.value = '';
+                }
+            }
+
+            typeSelect.addEventListener('change', toggleType);
+            subjectSelect.addEventListener('change', filterTeachers);
+            toggleType();
+        })();
+    </script>
+}

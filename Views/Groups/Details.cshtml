@@ -1,0 +1,21 @@
+@model Group
+
+@{
+    ViewData["Title"] = "Группа";
+}
+
+<h1 class="h3">@Model.Name</h1>
+<dl class="row">
+    <dt class="col-sm-3">Курс</dt><dd class="col-sm-9">@Model.Course</dd>
+    <dt class="col-sm-3">Год набора</dt><dd class="col-sm-9">@Model.YearOfAdmission</dd>
+    <dt class="col-sm-3">Специальность</dt><dd class="col-sm-9">@Model.Specialty?.Name</dd>
+    <dt class="col-sm-3">Факультет</dt><dd class="col-sm-9">@Model.Specialty?.Faculty?.Name</dd>
+</dl>
+<h2 class="h5">Студенты</h2>
+<ul>
+@foreach (var student in Model.Students.OrderBy(x => x.LastName))
+{
+    <li>@student.FullName</li>
+}
+</ul>
+<a class="btn btn-secondary" asp-action="Index">Назад</a>

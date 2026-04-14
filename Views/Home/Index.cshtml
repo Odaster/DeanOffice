@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Главная";
+}
+
+<div class="p-4 p-lg-5 bg-light border rounded">
+    <h1 class="h3 mb-2">База данных организации деятельности деканата</h1>
+    <div class="text-muted">Студенты, группы, дисциплины, оценки, посещаемость и отчеты.</div>
+</div>
+
+<div class="row mt-4 g-3">
+    <div class="col-md-4">
+        <a class="btn btn-outline-primary w-100 py-3" asp-controller="Students" asp-action="Index">Студенты</a>
+    </div>
+    <div class="col-md-4">
+        <a class="btn btn-outline-primary w-100 py-3" asp-controller="Grades" asp-action="Index">Оценки</a>
+    </div>
+    <div class="col-md-4">
+        <a class="btn btn-outline-primary w-100 py-3" asp-controller="Reports" asp-action="Index">Отчеты</a>
+    </div>
+</div>

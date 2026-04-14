@@ -1,0 +1,15 @@
+@model Student
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="row">
+    <div class="col-md-4 mb-3"><label asp-for="LastName" class="form-label">Фамилия</label><input asp-for="LastName" class="form-control" /><span asp-validation-for="LastName" class="text-danger"></span></div>
+    <div class="col-md-4 mb-3"><label asp-for="FirstName" class="form-label">Имя</label><input asp-for="FirstName" class="form-control" /><span asp-validation-for="FirstName" class="text-danger"></span></div>
+    <div class="col-md-4 mb-3"><label asp-for="MiddleName" class="form-label">Отчество</label><input asp-for="MiddleName" class="form-control" /></div>
+    <div class="col-md-4 mb-3"><label asp-for="StudentBookNumber" class="form-label">Номер зачетки</label><input asp-for="StudentBookNumber" class="form-control" /><span asp-validation-for="StudentBookNumber" class="text-danger"></span></div>
+    <div class="col-md-4 mb-3"><label asp-for="BirthDate" class="form-label">Дата рождения</label><input asp-for="BirthDate" class="form-control" type="date" /></div>
+    <div class="col-md-4 mb-3"><label asp-for="GroupId" class="form-label">Группа</label><select asp-for="GroupId" asp-items="ViewBag.GroupId" class="form-select"></select></div>
+</div>
+<div class="form-check mb-3">
+    <input asp-for="IsActive" class="form-check-input" />
+    <label asp-for="IsActive" class="form-check-label">Обучается</label>
+</div>

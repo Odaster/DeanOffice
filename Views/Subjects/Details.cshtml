@@ -1,0 +1,12 @@
+@model Subject
+
+@{
+    ViewData["Title"] = "Дисциплина";
+}
+
+<h1 class="h3">@Model.Name</h1>
+<dl class="row">
+    <dt class="col-sm-3">Код</dt><dd class="col-sm-9">@Model.Code</dd>
+    <dt class="col-sm-3">Часы</dt><dd class="col-sm-9">@Model.Hours</dd>
+</dl>
+<a class="btn btn-secondary" asp-action="Index">Назад</a>

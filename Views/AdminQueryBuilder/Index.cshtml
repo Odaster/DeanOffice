@@ -1,0 +1,47 @@
+@model SqlQueryResultViewModel
+
+@{
+    ViewData["Title"] = "SQL-конструктор";
+}
+
+<h1 class="h3">SQL-конструктор</h1>
+<p>Разрешены только SELECT-запросы. Команды изменения данных блокируются.</p>
+
+<form asp-action="Index" method="post">
+    <div class="mb-3">
+        <textarea asp-for="Query" class="form-control font-monospace" rows="5"></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Выполнить</button>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div class="alert alert-danger mt-3">@Model.ErrorMessage</div>
+}
+
+@if (Model.Columns.Any())
+{
+    <div class="table-responsive mt-3">
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    @foreach (var column in Model.Columns)
+                    {
+                        <th>@column</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.Rows)
+                {
+                    <tr>
+                        @foreach (var column in Model.Columns)
+                        {
+                            <td>@row[column]</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

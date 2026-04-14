@@ -1,0 +1,36 @@
+@model IEnumerable<Grade>
+
+@{
+    ViewData["Title"] = "Оценки";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">Оценки</h1>
+    @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+    {
+        <a class="btn btn-primary" asp-action="Create">Добавить</a>
+    }
+</div>
+
+<table class="table table-striped table-bordered">
+    <thead><tr><th>Дата</th><th>Студент</th><th>Группа</th><th>Дисциплина</th><th>Тип</th><th>Оценка</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.GradeDate.ToShortDateString()</td>
+            <td>@item.Student?.FullName</td>
+            <td>@item.Student?.Group?.Name</td>
+            <td>@item.GroupSubject?.Subject?.Name</td>
+            <td>@item.GradeType</td>
+            <td>@item.Value</td>
+            <td>
+                @if (User.IsInRole("Admin") || User.IsInRole("Teacher"))
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id">Изменить</a><span> | </span><a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

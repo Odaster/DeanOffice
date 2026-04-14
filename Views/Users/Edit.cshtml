@@ -1,0 +1,15 @@
+@model User
+
+@{
+    ViewData["Title"] = "Изменить пользователя";
+}
+
+<h1 class="h3">Изменить пользователя</h1>
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <partial name="_UserForm" model="Model" />
+    <button class="btn btn-primary" type="submit">Сохранить</button>
+    <a class="btn btn-secondary" asp-action="Index">Назад</a>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,11 @@
+@model Grade
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="row">
+    <div class="col-md-4 mb-3"><label asp-for="StudentId" class="form-label">Студент</label><select asp-for="StudentId" asp-items="ViewBag.StudentId" class="form-select"></select></div>
+    <div class="col-md-4 mb-3"><label asp-for="GroupSubjectId" class="form-label">Дисциплина группы</label><select asp-for="GroupSubjectId" asp-items="ViewBag.GroupSubjectId" class="form-select"></select></div>
+    <div class="col-md-2 mb-3"><label asp-for="Value" class="form-label">Оценка</label><input asp-for="Value" class="form-control" min="0" max="10" /></div>
+    <div class="col-md-2 mb-3"><label asp-for="GradeDate" class="form-label">Дата</label><input asp-for="GradeDate" class="form-control" type="date" /></div>
+    <div class="col-md-4 mb-3"><label asp-for="GradeType" class="form-label">Тип</label><input asp-for="GradeType" class="form-control" /></div>
+    <div class="col-md-8 mb-3"><label asp-for="Comment" class="form-label">Комментарий</label><input asp-for="Comment" class="form-control" /></div>
+</div>

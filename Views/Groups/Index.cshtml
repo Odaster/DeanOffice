@@ -1,0 +1,49 @@
+@model IEnumerable<Group>
+
+@{
+    ViewData["Title"] = "Группы";
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h1 class="h3">Группы</h1>
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="d-flex flex-wrap justify-content-end gap-2 ms-auto">
+            <form asp-action="PromoteStudentsNextCourse" method="post" onsubmit="return confirm('Перевести активные группы на следующий курс?');">
+                <button class="btn btn-outline-primary" type="submit">Перевести на следующий курс</button>
+            </form>
+            <a class="btn btn-primary" asp-action="Create">Добавить</a>
+        </div>
+    }
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<table class="table table-striped table-bordered">
+    <thead><tr><th>Группа</th><th>Курс</th><th>Год набора</th><th>Специальность</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Course</td>
+            <td>@item.YearOfAdmission</td>
+            <td>@item.Specialty?.Name</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Детали</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <span> | </span><a asp-action="Edit" asp-route-id="@item.Id">Изменить</a><span> | </span><a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

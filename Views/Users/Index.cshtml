@@ -1,0 +1,29 @@
+@model IEnumerable<User>
+
+@{
+    ViewData["Title"] = "Пользователи";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">Пользователи</h1>
+    <a class="btn btn-primary" asp-action="Create">Добавить</a>
+</div>
+
+<table class="table table-striped table-bordered">
+    <thead><tr><th>Логин</th><th>ФИО</th><th>Роль</th><th>Почта</th><th>Телефон</th><th>Студент</th><th>Преподаватель</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.UserName</td>
+            <td>@item.FullName</td>
+            <td>@item.Role?.Name</td>
+            <td>@item.Email @(item.EmailConfirmed ? "✓" : "")</td>
+            <td>@item.PhoneNumber @(item.PhoneNumberConfirmed ? "✓" : "")</td>
+            <td>@item.Student?.FullName</td>
+            <td>@item.Teacher?.FullName</td>
+            <td><a asp-action="Edit" asp-route-id="@item.Id">Изменить</a> | <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a></td>
+        </tr>
+    }
+    </tbody>
+</table>

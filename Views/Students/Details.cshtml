@@ -1,0 +1,14 @@
+@model Student
+
+@{
+    ViewData["Title"] = "Студент";
+}
+
+<h1 class="h3">@Model.FullName</h1>
+<dl class="row">
+    <dt class="col-sm-3">Зачетка</dt><dd class="col-sm-9">@Model.StudentBookNumber</dd>
+    <dt class="col-sm-3">Группа</dt><dd class="col-sm-9">@Model.Group?.Name</dd>
+    <dt class="col-sm-3">Специальность</dt><dd class="col-sm-9">@Model.Group?.Specialty?.Name</dd>
+    <dt class="col-sm-3">Дата рождения</dt><dd class="col-sm-9">@Model.BirthDate.ToShortDateString()</dd>
+</dl>
+<a class="btn btn-secondary" asp-action="Index">Назад</a>

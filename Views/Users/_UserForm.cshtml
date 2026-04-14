@@ -1,0 +1,76 @@
+@model User
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="row">
+    <div class="col-md-4 mb-3"><label asp-for="UserName" class="form-label">Логин</label><input asp-for="UserName" class="form-control" /></div>
+    <div class="col-md-4 mb-3"><label asp-for="PasswordHash" class="form-label">Пароль</label><input asp-for="PasswordHash" class="form-control" /></div>
+    <div class="col-md-4 mb-3" id="full-name-field"><label asp-for="FullName" class="form-label">ФИО</label><input asp-for="FullName" class="form-control" id="full-name-input" /><span asp-validation-for="FullName" class="text-danger"></span></div>
+    <div class="col-md-4 mb-3"><label asp-for="Email" class="form-label">Почта</label><input asp-for="Email" class="form-control" /></div>
+    <div class="col-md-4 mb-3"><label asp-for="PhoneNumber" class="form-label">Телефон</label><input asp-for="PhoneNumber" class="form-control" /></div>
+    <div class="col-md-4 mb-3"><label asp-for="RoleId" class="form-label">Роль</label><select asp-for="RoleId" asp-items="ViewBag.RoleId" class="form-select" id="user-role-select"></select></div>
+    <div class="col-md-4 mb-3 user-link-field" id="student-link-field"><label asp-for="StudentId" class="form-label">Студент</label><select asp-for="StudentId" asp-items="ViewBag.StudentId" class="form-select" id="student-select"><option value="">Не выбран</option></select><span asp-validation-for="StudentId" class="text-danger"></span></div>
+    <div class="col-md-4 mb-3 user-link-field" id="teacher-link-field"><label asp-for="TeacherId" class="form-label">Преподаватель</label><select asp-for="TeacherId" asp-items="ViewBag.TeacherId" class="form-select" id="teacher-select"><option value="">Не выбран</option></select><span asp-validation-for="TeacherId" class="text-danger"></span></div>
+</div>
+<div class="form-check mb-2">
+    <input asp-for="EmailConfirmed" class="form-check-input" />
+    <label asp-for="EmailConfirmed" class="form-check-label">Почта подтверждена</label>
+</div>
+<div class="form-check mb-3">
+    <input asp-for="PhoneNumberConfirmed" class="form-check-input" />
+    <label asp-for="PhoneNumberConfirmed" class="form-check-label">Телефон подтвержден</label>
+</div>
+
+<script>
+    (() => {
+        const roleSelect = document.getElementById('user-role-select');
+        const studentField = document.getElementById('student-link-field');
+        const teacherField = document.getElementById('teacher-link-field');
+        const studentSelect = document.getElementById('student-select');
+        const teacherSelect = document.getElementById('teacher-select');
+        const fullNameField = document.getElementById('full-name-field');
+        const fullNameInput = document.getElementById('full-name-input');
+
+        if (!roleSelect || !studentField || !teacherField || !studentSelect || !teacherSelect || !fullNameField || !fullNameInput) {
+            return;
+        }
+
+        const setFieldState = (field, select, enabled) => {
+            field.classList.toggle('opacity-50', !enabled);
+            select.disabled = !enabled;
+            if (!enabled) {
+                select.value = '';
+            }
+        };
+
+        const getSelectedText = (select) => {
+            const option = select.selectedOptions[0];
+            return option && option.value ? option.text.trim() : '';
+        };
+
+        const syncFullName = () => {
+            const roleName = roleSelect.selectedOptions[0]?.text.trim();
+            const isStudent = roleName === 'Student';
+            const isTeacher = roleName === 'Teacher';
+            fullNameField.classList.toggle('opacity-50', isStudent || isTeacher);
+            fullNameInput.readOnly = isStudent || isTeacher;
+
+            if (isStudent) {
+                fullNameInput.value = getSelectedText(studentSelect);
+            } else if (isTeacher) {
+                fullNameInput.value = getSelectedText(teacherSelect);
+            }
+        };
+
+        const updateLinkedFields = () => {
+            const roleName = roleSelect.selectedOptions[0]?.text.trim();
+            setFieldState(studentField, studentSelect, roleName === 'Student');
+            setFieldState(teacherField, teacherSelect, roleName === 'Teacher');
+            syncFullName();
+        };
+
+        roleSelect.addEventListener('change', updateLinkedFields);
+        studentSelect.addEventListener('change', syncFullName);
+        teacherSelect.addEventListener('change', syncFullName);
+        updateLinkedFields();
+    })();
+</script>

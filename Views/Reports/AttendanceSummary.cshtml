@@ -1,0 +1,25 @@
+@model IEnumerable<ReportAttendanceViewModel>
+
+@{
+    ViewData["Title"] = "Отчет по посещаемости";
+}
+
+<div class="d-print-none d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">Посещаемость по группам и дисциплинам</h1>
+    <div>
+        <button class="btn btn-outline-secondary" onclick="window.print()">Печать</button>
+        <a class="btn btn-outline-success" asp-action="ExportAttendance" asp-route-format="csv">CSV</a>
+        <a class="btn btn-outline-success" asp-action="ExportAttendance" asp-route-format="xls">Excel</a>
+        <a class="btn btn-outline-success" asp-action="ExportAttendance" asp-route-format="doc">Word</a>
+    </div>
+</div>
+
+<table class="table table-striped table-bordered">
+    <thead><tr><th>Группа</th><th>Дисциплина</th><th>Всего занятий</th><th>Посещено</th><th>%</th></tr></thead>
+    <tbody>
+    @foreach (var row in Model)
+    {
+        <tr><td>@row.GroupName</td><td>@row.SubjectName</td><td>@row.TotalLessons</td><td>@row.PresentCount</td><td>@row.AttendancePercent.ToString("F2")</td></tr>
+    }
+    </tbody>
+</table>

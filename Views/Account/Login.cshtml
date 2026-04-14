@@ -1,0 +1,62 @@
+@model LoginViewModel
+
+@{
+    ViewData["Title"] = "Вход";
+}
+
+<div class="row justify-content-center align-items-start g-4">
+    <div class="col-lg-5 col-md-7">
+        <div class="border rounded p-4">
+            <h1 class="h3 mb-3">Вход</h1>
+            <form asp-action="Login" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <div class="input-group">
+                    <input asp-for="Password" class="form-control" />
+                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="Password" aria-label="Показать или скрыть пароль">&#128065;</button>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <button class="btn btn-primary" type="submit">Войти</button>
+            <div class="mt-2">
+                <a asp-action="ForgotPassword">Забыли пароль?</a>
+            </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-5 col-md-7">
+        <div class="border rounded p-4">
+            <h2 class="h5 mb-3">Демо-пользователи</h2>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <tr><th>Роль</th><th>Логин</th><th>Пароль</th></tr>
+                    <tr><td>Admin</td><td>admin</td><td>admin123</td></tr>
+                    <tr><td>Teacher</td><td>teacher</td><td>teacher123</td></tr>
+                    <tr><td>Student</td><td>student</td><td>student123</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var input = document.getElementById(button.dataset.target);
+                if (!input) {
+                    return;
+                }
+
+                input.type = input.type === 'password' ? 'text' : 'password';
+            });
+        });
+    </script>
+}

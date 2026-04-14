@@ -1,0 +1,24 @@
+@model IEnumerable<AuditLog>
+
+@{
+    ViewData["Title"] = "Журнал действий";
+}
+
+<h1 class="h3 mb-3">Журнал действий пользователей</h1>
+
+<table class="table table-striped table-bordered table-sm">
+    <thead><tr><th>Дата UTC</th><th>Пользователь</th><th>Действие</th><th>Сущность</th><th>ID</th><th>Детали</th></tr></thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+            <td>@item.User?.UserName</td>
+            <td>@item.Action</td>
+            <td>@item.EntityName</td>
+            <td>@item.EntityId</td>
+            <td>@item.Details</td>
+        </tr>
+    }
+    </tbody>
+</table>

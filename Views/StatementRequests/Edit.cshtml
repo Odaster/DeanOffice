@@ -1,0 +1,145 @@
+@model StatementRequest
+
+@{
+    ViewData["Title"] = "Редактирование ведомости";
+    var statuses = ViewBag.Statuses as IEnumerable<string> ?? Array.Empty<string>();
+    var certificatePurposes = ViewBag.CertificatePurposes as IEnumerable<string> ?? Array.Empty<string>();
+    var absenceReasons = ViewBag.AbsenceReasons as IEnumerable<string> ?? Array.Empty<string>();
+    var subjects = ViewBag.Subjects as IEnumerable<StatementSubjectOption> ?? Array.Empty<StatementSubjectOption>();
+    var teachers = ViewBag.Teachers as IEnumerable<StatementTeacherOption> ?? Array.Empty<StatementTeacherOption>();
+}
+
+<h1 class="h3 mb-3">Редактирование ведомости</h1>
+
+<form asp-action="Edit" method="post" class="card p-3 p-md-4 statement-form">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="RequestType" />
+    <input type="hidden" asp-for="StudentId" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <dl class="row mb-3">
+        <dt class="col-sm-3">Студент</dt>
+        <dd class="col-sm-9">@Model.Student?.FullName</dd>
+        <dt class="col-sm-3">Группа</dt>
+        <dd class="col-sm-9">@Model.Student?.Group?.Name</dd>
+        <dt class="col-sm-3">Тип</dt>
+        <dd class="col-sm-9">@Model.RequestType</dd>
+    </dl>
+
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label">Статус</label>
+        <select asp-for="Status" class="form-select">
+            @foreach (var status in statuses)
+            {
+                <option value="@status">@status</option>
+            }
+        </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
+    </div>
+
+    @if (Model.RequestType == StatementRequest.TypeEducationCertificate)
+    {
+        <div class="form-check mb-3">
+            <input asp-for="CertificateWithEmblem" class="form-check-input" />
+            <label asp-for="CertificateWithEmblem" class="form-check-label">Справка с гербом</label>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CertificatePurpose" class="form-label">Назначение</label>
+            <select asp-for="CertificatePurpose" class="form-select">
+                @foreach (var purpose in certificatePurposes)
+                {
+                    <option value="@purpose">@purpose</option>
+                }
+            </select>
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <label asp-for="SubjectId" class="form-label">Предмет</label>
+            <select asp-for="SubjectId" class="form-select" id="subjectSelect">
+                <option value="">Выберите предмет</option>
+                @foreach (var subject in subjects)
+                {
+                    <option value="@subject.Id">@subject.Name</option>
+                }
+            </select>
+            <span asp-validation-for="SubjectId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="TeacherId" class="form-label">Преподаватель</label>
+            <select asp-for="TeacherId" class="form-select" id="teacherSelect">
+                <option value="">Выберите преподавателя</option>
+                @foreach (var teacher in teachers)
+                {
+                    <option value="@teacher.Id" data-subject-id="@teacher.SubjectId">@teacher.Name</option>
+                }
+            </select>
+            <span asp-validation-for="TeacherId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="MissedDate" class="form-label">Дата пропуска</label>
+            <input asp-for="MissedDate" class="form-control" type="date" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="AbsenceReason" class="form-label">Причина</label>
+            <select asp-for="AbsenceReason" class="form-select">
+                @foreach (var reason in absenceReasons)
+                {
+                    <option value="@reason">@reason</option>
+                }
+            </select>
+        </div>
+    }
+
+    <div class="mb-3">
+        <label asp-for="AdminComment" class="form-label">Комментарий администратора</label>
+        <textarea asp-for="AdminComment" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="AdminComment" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Назад</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    @if (Model.RequestType == StatementRequest.TypeRetake)
+    {
+        <script>
+            (() => {
+                const subjectSelect = document.getElementById('subjectSelect');
+                const teacherSelect = document.getElementById('teacherSelect');
+
+                function filterTeachers() {
+                    const subjectId = subjectSelect.value;
+                    let selectedTeacherIsVisible = false;
+
+                    teacherSelect.querySelectorAll('option').forEach((option) => {
+                        if (!option.value) {
+                            option.hidden = false;
+                            return;
+                        }
+
+                        const isVisible = option.dataset.subjectId === subjectId;
+                        option.hidden = !isVisible;
+                        if (isVisible && option.selected) {
+                            selectedTeacherIsVisible = true;
+                        }
+                    });
+
+                    if (!selectedTeacherIsVisible) {
+                        teacherSelect.value = '';
+                    }
+                }
+
+                subjectSelect.addEventListener('change', filterTeachers);
+                filterTeachers();
+            })();
+        </script>
+    }
+}

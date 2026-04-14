@@ -1,0 +1,14 @@
+@model Attendance
+
+@{
+    ViewData["Title"] = "Добавить посещаемость";
+}
+
+<h1 class="h3">Добавить посещаемость</h1>
+<form asp-action="Create" method="post">
+    <partial name="_AttendanceForm" model="Model" />
+    <button class="btn btn-primary" type="submit">Сохранить</button>
+    <a class="btn btn-secondary" asp-action="Index">Назад</a>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

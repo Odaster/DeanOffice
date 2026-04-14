@@ -1,0 +1,9 @@
+@model Group
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="row">
+    <div class="col-md-3 mb-3"><label asp-for="Name" class="form-label">Название</label><input asp-for="Name" class="form-control" /></div>
+    <div class="col-md-3 mb-3"><label asp-for="Course" class="form-label">Курс</label><input asp-for="Course" class="form-control" /></div>
+    <div class="col-md-3 mb-3"><label asp-for="YearOfAdmission" class="form-label">Год набора</label><input asp-for="YearOfAdmission" class="form-control" /></div>
+    <div class="col-md-3 mb-3"><label asp-for="SpecialtyId" class="form-label">Специальность</label><select asp-for="SpecialtyId" asp-items="ViewBag.SpecialtyId" class="form-select"></select></div>
+</div>

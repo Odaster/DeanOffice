@@ -1,0 +1,130 @@
+erDiagram
+    Roles ||--o{ Users : "RoleId"
+    Faculties ||--o{ Specialties : "FacultyId"
+    Specialties ||--o{ Groups : "SpecialtyId"
+    Groups ||--o{ Students : "GroupId"
+    Students ||--o| Users : "StudentId"
+    Teachers ||--o| Users : "TeacherId"
+    Groups ||--o{ GroupSubjects : "GroupId"
+    Subjects ||--o{ GroupSubjects : "SubjectId"
+    Teachers ||--o{ GroupSubjects : "TeacherId"
+    Semesters ||--o{ GroupSubjects : "SemesterId"
+    Students ||--o{ Grades : "StudentId"
+    GroupSubjects ||--o{ Grades : "GroupSubjectId"
+    Students ||--o{ Attendance : "StudentId"
+    GroupSubjects ||--o{ Attendance : "GroupSubjectId"
+    Users ||--o{ AuditLogs : "UserId"
+
+    Roles {
+        int Id PK
+        varchar Name UK
+    }
+
+    Users {
+        int Id PK
+        varchar UserName UK
+        varchar PasswordHash
+        varchar FullName
+        varchar Email
+        varchar PhoneNumber
+        bool EmailConfirmed
+        bool PhoneNumberConfirmed
+        varchar ProfilePhotoPath
+        int RoleId FK
+        int StudentId FK
+        int TeacherId FK
+    }
+
+    Faculties {
+        int Id PK
+        varchar Name
+        varchar Code
+    }
+
+    Specialties {
+        int Id PK
+        varchar Name
+        varchar Code
+        int FacultyId FK
+    }
+
+    Groups {
+        int Id PK
+        varchar Name
+        int Course
+        int YearOfAdmission
+        int SpecialtyId FK
+    }
+
+    Students {
+        int Id PK
+        varchar LastName
+        varchar FirstName
+        varchar MiddleName
+        varchar StudentBookNumber UK
+        date BirthDate
+        bool IsActive
+        int GroupId FK
+    }
+
+    Teachers {
+        int Id PK
+        varchar LastName
+        varchar FirstName
+        varchar MiddleName
+        varchar Department
+        varchar Email
+    }
+
+    Subjects {
+        int Id PK
+        varchar Name
+        varchar Code UK
+        int Hours
+    }
+
+    Semesters {
+        int Id PK
+        varchar Name
+        int Number
+        varchar AcademicYear
+        date StartDate
+        date EndDate
+    }
+
+    GroupSubjects {
+        int Id PK
+        int GroupId FK
+        int SubjectId FK
+        int TeacherId FK
+        int SemesterId FK
+    }
+
+    Grades {
+        int Id PK
+        int StudentId FK
+        int GroupSubjectId FK
+        int Value
+        varchar GradeType
+        date GradeDate
+        varchar Comment
+    }
+
+    Attendance {
+        int Id PK
+        int StudentId FK
+        int GroupSubjectId FK
+        date LessonDate
+        bool IsPresent
+        varchar Comment
+    }
+
+    AuditLogs {
+        int Id PK
+        int UserId FK
+        varchar Action
+        varchar EntityName
+        varchar EntityId
+        datetime Timestamp
+        varchar Details
+    }

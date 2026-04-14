@@ -1,0 +1,13 @@
+@model Subject
+
+@{
+    ViewData["Title"] = "Удалить дисциплину";
+}
+
+<h1 class="h3">Удалить дисциплину</h1>
+<p>Удалить дисциплину <strong>@Model.Name</strong>?</p>
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button class="btn btn-danger" type="submit">Удалить</button>
+    <a class="btn btn-secondary" asp-action="Index">Отмена</a>
+</form>

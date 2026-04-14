@@ -1,0 +1,79 @@
+@model VerifyResetCodeViewModel
+
+@{
+    ViewData["Title"] = "Код восстановления";
+}
+
+<h1 class="h3 mb-3">Код восстановления</h1>
+
+@if (TempData["ResetMessage"] != null)
+{
+    <div class="alert alert-info">@TempData["ResetMessage"]</div>
+}
+@if (TempData["ResetError"] != null)
+{
+    <div class="alert alert-danger">@TempData["ResetError"]</div>
+}
+
+<p>Введите шестизначный код, отправленный на @Model.Destination.</p>
+
+<div class="row">
+    <div class="col-md-5">
+        <form asp-action="VerifyResetCode" method="post">
+            <input type="hidden" asp-for="VerificationCodeId" />
+            <input type="hidden" asp-for="Destination" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="Code" class="form-label"></label>
+                <input asp-for="Code" class="form-control" maxlength="6" pattern="\d{6}" inputmode="numeric" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <button class="btn btn-primary" type="submit">Подтвердить код</button>
+        </form>
+
+        <form asp-action="ResendResetCode" method="post" class="mt-3">
+            <input type="hidden" name="id" value="@Model.VerificationCodeId" />
+            <button id="resend-code-button"
+                    class="btn btn-outline-secondary"
+                    type="submit"
+                    data-available-at="@Model.ResendAvailableAtUnixMilliseconds">
+                Отправить код еще раз
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (() => {
+            const button = document.getElementById('resend-code-button');
+            if (!button) {
+                return;
+            }
+
+            const availableAt = Number(button.dataset.availableAt);
+            const defaultText = 'Отправить код еще раз';
+
+            const updateButton = () => {
+                const remaining = Math.ceil((availableAt - Date.now()) / 1000);
+                if (remaining > 0) {
+                    button.disabled = true;
+                    button.textContent = `${defaultText} (${remaining} сек.)`;
+                    return;
+                }
+
+                button.disabled = false;
+                button.textContent = defaultText;
+            };
+
+            updateButton();
+            const timer = setInterval(() => {
+                updateButton();
+                if (!button.disabled) {
+                    clearInterval(timer);
+                }
+            }, 1000);
+        })();
+    </script>
+}

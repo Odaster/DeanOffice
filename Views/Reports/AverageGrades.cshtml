@@ -1,0 +1,25 @@
+@model IEnumerable<ReportAverageGradeViewModel>
+
+@{
+    ViewData["Title"] = "Средний балл";
+}
+
+<div class="d-print-none d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3">Средний балл студентов</h1>
+    <div>
+        <button class="btn btn-outline-secondary" onclick="window.print()">Печать</button>
+        <a class="btn btn-outline-success" asp-action="ExportAverageGrades" asp-route-format="csv">CSV</a>
+        <a class="btn btn-outline-success" asp-action="ExportAverageGrades" asp-route-format="xls">Excel</a>
+        <a class="btn btn-outline-success" asp-action="ExportAverageGrades" asp-route-format="doc">Word</a>
+    </div>
+</div>
+
+<table class="table table-striped table-bordered">
+    <thead><tr><th>Студент</th><th>Группа</th><th>Средний балл</th><th>Оценок</th></tr></thead>
+    <tbody>
+    @foreach (var row in Model)
+    {
+        <tr><td>@row.StudentName</td><td>@row.GroupName</td><td>@row.AverageGrade.ToString("F2")</td><td>@row.GradesCount</td></tr>
+    }
+    </tbody>
+</table>

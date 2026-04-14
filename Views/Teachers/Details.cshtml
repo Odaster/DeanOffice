@@ -1,0 +1,12 @@
+@model Teacher
+
+@{
+    ViewData["Title"] = "Преподаватель";
+}
+
+<h1 class="h3">@Model.FullName</h1>
+<dl class="row">
+    <dt class="col-sm-3">Кафедра</dt><dd class="col-sm-9">@Model.Department</dd>
+    <dt class="col-sm-3">Email</dt><dd class="col-sm-9">@Model.Email</dd>
+</dl>
+<a class="btn btn-secondary" asp-action="Index">Назад</a>
