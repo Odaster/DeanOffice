@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: deanoffice-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: DeanOfficeDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      TZ: Europe/Minsk
+    ports:
+      - "5433:5432"
+    volumes:
+      - deanoffice_postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d DeanOfficeDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: deanoffice-coursework:latest
+    container_name: deanoffice-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=DeanOfficeDb;Username=postgres;Password=postgres
+      Backup__Folder: Backups
+      Backup__PgDumpPath: pg_dump
+      Backup__PgRestorePath: pg_restore
+      Notifications__Sms__Provider: Test
+    ports:
+      - "5157:8080"
+    volumes:
+      - ./Backups:/app/Backups
+      - ./wwwroot/uploads/profiles:/app/wwwroot/uploads/profiles
+
+volumes:
+  deanoffice_postgres_data:

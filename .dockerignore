@@ -1,0 +1,11 @@
+bin/
+obj/
+.git/
+.vs/
+publish/
+Backups/*.backup
+server.out.log
+server.err.log
+**/published.out.log
+**/published.err.log
+*.user
